@@ -7,6 +7,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Auth from "./pages/Auth";
 import Discover from "./pages/Discover";
+import LoginPage from "./pages/LoginPage";
+import DiscoverPage from "./pages/DiscoverPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,12 +21,25 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Original Auth route */}
             <Route path="/" element={<Auth />} />
+            {/* New Prashikshan login route */}
+            <Route path="/login" element={<LoginPage />} />
+            {/* Original Discover route */}
             <Route
               path="/discover"
               element={
                 <ProtectedRoute>
                   <Discover />
+                </ProtectedRoute>
+              }
+            />
+            {/* New Prashikshan Discover route */}
+            <Route
+              path="/discover-new"
+              element={
+                <ProtectedRoute>
+                  <DiscoverPage />
                 </ProtectedRoute>
               }
             />

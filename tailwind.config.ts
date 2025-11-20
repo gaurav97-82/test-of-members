@@ -53,6 +53,9 @@ export default {
           light: "hsl(var(--success-light))",
           bg: "hsl(var(--success-bg))",
         },
+        // Prashikshan brand colors
+        'prashikshan-primary': '#388E3C',  // Darker Green
+        'prashikshan-light': '#E8F5E9',   // Very Light Green
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
