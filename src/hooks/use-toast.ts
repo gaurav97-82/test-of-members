@@ -14,7 +14,7 @@ export function useToast() {
 }
 
 // And the toast function (often needs the useToast hook or a global dispatch)
-export const toast = ({ /* ... options */ }) => {
+export const toast = (_options?: Record<string, unknown>) => {
   // ❌ If you are trying to call a function or module that hasn't been initialized 
   //    or is imported incorrectly, it will cause the crash.
   // ...
