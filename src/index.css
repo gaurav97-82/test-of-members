@@ -6,6 +6,25 @@
 All colors MUST be HSL.
 */
 
+/* Custom Green Palette for Prashikshan brand */
+@layer utilities {
+  .bg-prashikshan-primary {
+    background-color: #388E3C; /* Darker Green */
+  }
+  .text-prashikshan-primary {
+    color: #388E3C;
+  }
+  .bg-prashikshan-light {
+    background-color: #E8F5E9; /* Very Light Green */
+  }
+  .text-prashikshan-light {
+    color: #E8F5E9;
+  }
+  .border-prashikshan-primary {
+    border-color: #388E3C;
+  }
+}
+
 @layer base {
   :root {
     --background: 150 10% 8%;
