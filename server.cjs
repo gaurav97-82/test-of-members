@@ -1,15 +1,16 @@
-// server.js (CommonJS Syntax)
+// server.cjs (FIXED)
 const express = require('express');
 const path = require('path');
 
 const app = express();
-// Use the environment port, or default to 3000 for local testing
+// Use the environment port, or default to 3000
 const PORT = process.env.PORT || 3000; 
 
-// Find the current directory path
-const __dirname = path.resolve();
+// 🚨 REMOVED: const __dirname = path.resolve(); 
+// The global __dirname is automatically provided here!
 
-// Serve the static files from the 'dist' folder (Vite's build output)
+// Serve the static files from the 'dist' folder
+// Use the built-in __dirname to construct the path
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // For any other GET request, serve the main index.html file
