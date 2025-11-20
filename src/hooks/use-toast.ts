@@ -1,14 +1,21 @@
-// File: src/hooks/use-toast.ts (FIXED STRUCTURE)
+// Example of a common error if the definition is incomplete:
+// (assuming your context is defined elsewhere)
 
-// 1. DEFINE the function/hook instead of importing it.
 export function useToast() {
-  // ... actual implementation of your hook (e.g., calling useContext)
-  return { /* ... */ };
+  // ❌ If you are missing the correct import or context hook call here, 
+  //    it will fail when any component tries to use it.
+  const context = React.useContext(ToastContext); 
+  
+  if (!context) {
+    // This check is crucial if you are deploying!
+    throw new Error('useToast must be used within a <ToastProvider />'); 
+  }
+  return context;
 }
 
-// 2. DEFINE the utility function instead of importing it.
-export const toast = (options) => {
-  // ... actual implementation of your utility function (e.g., dispatching a state change)
-};
-
-// NO OTHER IMPORTS or RE-EXPORTS are needed.
+// And the toast function (often needs the useToast hook or a global dispatch)
+export const toast = ({ /* ... options */ }) => {
+  // ❌ If you are trying to call a function or module that hasn't been initialized 
+  //    or is imported incorrectly, it will cause the crash.
+  // ...
+}
