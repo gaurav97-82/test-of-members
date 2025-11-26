@@ -1,3 +1,23 @@
+/* CSS Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-color: #646cff;
+  --secondary-color: #61dafb;
+  --text-color: rgba(255, 255, 255, 0.87);
+  --background-color: #242424;
+}
+
+body {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -5,19 +25,25 @@
   text-align: center;
 }
 
+/* Logo Styles */
 .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
-  transition: filter 300ms;
+  transition: filter 300ms ease, transform 300ms ease;
+  display: inline-block;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
+  transform: scale(1.05);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
+/* Logo Animation */
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
@@ -27,16 +53,58 @@
   }
 }
 
+/* Better animation selector */
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
+  .logo.spin {
     animation: logo-spin infinite 20s linear;
   }
 }
 
+/* Respects reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .logo {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Card Improvements */
 .card {
   padding: 2em;
+  margin: 1em 0;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+  background-color: #1a1a1a;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.card:hover {
+  border-color: #646cff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(100, 108, 255, 0.1);
 }
 
 .read-the-docs {
   color: #888;
+  margin-top: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #root {
+    padding: 1rem;
+  }
+  
+  .logo {
+    height: 4em;
+    padding: 1em;
+  }
+  
+  .card {
+    padding: 1.5em;
+    margin: 0.5em 0;
+  }
 }
