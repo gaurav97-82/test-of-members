@@ -2,125 +2,120 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Design System - All colors in HSL format */
 
-/* Custom Green Palette for Prashikshan brand */
 @layer utilities {
+  /* Prashikshan brand colors in HSL */
   .bg-prashikshan-primary {
-    background-color: #388E3C; /* Darker Green */
+    background-color: hsl(123, 39%, 39%);
   }
   .text-prashikshan-primary {
-    color: #388E3C;
+    color: hsl(123, 39%, 39%);
   }
   .bg-prashikshan-light {
-    background-color: #E8F5E9; /* Very Light Green */
+    background-color: hsl(125, 55%, 94%);
   }
   .text-prashikshan-light {
-    color: #E8F5E9;
+    color: hsl(125, 55%, 94%);
   }
   .border-prashikshan-primary {
-    border-color: #388E3C;
+    border-color: hsl(123, 39%, 39%);
   }
 }
 
 @layer base {
   :root {
+    /* Base colors */
     --background: 150 10% 8%;
     --foreground: 150 5% 95%;
 
+    /* Component colors */
     --card: 150 10% 12%;
     --card-foreground: 150 5% 95%;
-
     --popover: 150 10% 12%;
     --popover-foreground: 150 5% 95%;
 
+    /* Primary colors */
     --primary: 142 76% 36%;
     --primary-foreground: 0 0% 100%;
 
+    /* Secondary colors */
     --secondary: 150 10% 18%;
     --secondary-foreground: 150 5% 95%;
 
+    /* State colors */
     --muted: 150 10% 15%;
     --muted-foreground: 150 5% 65%;
-
     --accent: 142 76% 46%;
     --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 150 5% 95%;
 
+    /* UI elements */
     --border: 150 10% 20%;
     --input: 150 10% 20%;
     --ring: 142 76% 36%;
 
-    --radius: 0.75rem;
-
+    /* Success variants - consistent naming */
     --success: 142 76% 36%;
     --success-light: 142 76% 56%;
-    --success-bg: 150 10% 18%;
+    --success-dark: 142 76% 26%;
+    --success-foreground: 0 0% 100%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(142, 76%, 36%), hsl(142, 76%, 46%));
-    --gradient-card: linear-gradient(180deg, hsl(150, 10%, 12%), hsl(150, 10%, 8%));
+    /* Border radius */
+    --radius: 0.75rem;
 
+    /* Gradients using CSS variables */
+    --gradient-primary: linear-gradient(
+      135deg, 
+      hsl(var(--primary)), 
+      hsl(var(--accent))
+    );
+    --gradient-card: linear-gradient(
+      180deg, 
+      hsl(var(--card)), 
+      hsl(var(--background))
+    );
+
+    /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3);
-    --shadow-green: 0 4px 14px 0 hsl(142 76% 36% / 0.3);
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+    --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.3);
+    --shadow-green: 0 4px 14px 0 hsl(var(--primary) / 0.3);
 
+    /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
+    /* Override specific variables for dark mode */
     --background: 0 0% 10%;
     --foreground: 0 0% 98%;
-
     --card: 0 0% 13%;
     --card-foreground: 0 0% 98%;
-
-    --popover: 0 0% 13%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 122 39% 49%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 122 20% 20%;
-    --secondary-foreground: 122 39% 94%;
-
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 65%;
-
-    --accent: 88 50% 53%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 122 39% 49%;
-
-    --success: 122 39% 49%;
-    --success-light: 122 39% 76%;
-    --success-bg: 122 20% 20%;
-
-    --gradient-primary: linear-gradient(135deg, hsl(122, 39%, 49%), hsl(88, 50%, 53%));
-    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 13%), hsl(122, 20%, 15%));
-
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3);
-    --shadow-green: 0 4px 14px 0 hsl(122 39% 49% / 0.4);
+    
+    /* Update other variables as needed for dark mode */
+    --shadow-green: 0 4px 14px 0 hsl(var(--primary) / 0.4);
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
 
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom component styles */
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 transition-colors;
+  }
+  
+  .card-gradient {
+    background: var(--gradient-card);
   }
 }
