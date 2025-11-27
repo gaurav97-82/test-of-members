@@ -1,57 +1,41 @@
-import React, { useState, useEffect } from 'react';
-
-import Login from './components/Login.jsx';
-import Discover from './components/Discover.jsx';
-import SetupProfile from './components/SetupProfile.jsx';
+import React from 'react';
 import './App.css';
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [setupComplete, setSetupComplete] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
-      if (user) {
-        // Check if user has completed setup
-        const hasCompletedSetup = localStorage.getItem(`setupComplete_${user.uid}`);
-        setSetupComplete(!!hasCompletedSetup);
-      } else {
-        setSetupComplete(false);
-      }
-      setLoading(false);
-    });
-
-    return unsubscribe;
-  }, []);
-
-  const handleSetupComplete = (profileData) => {
-    // Save profile data (you can save to Firestore later)
-    console.log('Profile setup completed:', profileData);
-    
-    // Mark setup as complete
-    localStorage.setItem(`setupComplete_${user.uid}`, 'true');
-    setSetupComplete(true);
-  };
-
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner">Loading...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="App">
-      {!user ? (
-        <Login />
-      ) : !setupComplete ? (
-        <SetupProfile onComplete={handleSetupComplete} />
-      ) : (
-        <Discover user={user} />
-      )}
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        textAlign: 'center',
+        padding: '2rem'
+      }}>
+        <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+          Prashikshan
+        </h1>
+        <p style={{ fontSize: '1.2rem', opacity: 0.9 }}>
+          Learning Platform - Coming Soon
+        </p>
+        <div style={{ marginTop: '2rem' }}>
+          <button style={{
+            padding: '12px 24px',
+            background: 'white',
+            color: '#667eea',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '1rem',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}>
+            Get Started
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
