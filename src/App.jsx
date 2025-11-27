@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-import Login from './components/Login';
-import Discover from './components/Discover';
-import SetupProfile from './components/SetupProfile';
+import Login from './components/Login.jsx';
+import Discover from './components/Discover.jsx';
+import SetupProfile from './components/SetupProfile.jsx';
 import './App.css';
 
 function App() {
