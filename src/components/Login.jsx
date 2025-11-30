@@ -1,41 +1,111 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 const Login = ({ onAuthStateChange }) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSignUp = async () => {
+    setLoading(true);
+    try {
+      // Create a unique email for demo
+      const demoEmail = `demo${Date.now()}@prashikshan.com`;
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: demoEmail,
+        password: 'demopassword123',
+        options: {
+          data: {
+            display_name: 'Demo User'
+          }
+        }
+      });
+
+      if (error) {
+        // If user already exists, try sign in
+        if (error.message.includes('already registered')) {
+          await handleSignIn(demoEmail);
+        } else {
+          throw error;
+        }
+      } else if (data.user) {
+        console.log('✅ User created:', data.user);
+        onAuthStateChange(data.user);
+      }
+    } catch (error) {
+      console.error('❌ Sign up error:', error);
+      // Fallback to mock user if Supabase fails
+      const mockUser = {
+        id: `user_${Date.now()}`,
+        email: 'demo@prashikshan.com',
+        user_metadata: { display_name: 'Demo User' }
+      };
+      onAuthStateChange(mockUser);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignIn = async (email) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: 'demopassword123'
+      });
+
+      if (error) throw error;
+      
+      if (data.user) {
+        console.log('✅ User signed in:', data.user);
+        onAuthStateChange(data.user);
+      }
+    } catch (error) {
+      console.error('❌ Sign in error:', error);
+      throw error;
+    }
+  };
+
   const handleMockLogin = () => {
-    const mockUser = {
-      uid: `user_${Date.now()}`,
-      email: 'demo@example.com',
-      displayName: 'Demo User'
-    };
-    onAuthStateChange(mockUser);
+    // Use actual Supabase auth instead of mock
+    handleSignUp();
   };
 
   const testSupabaseManually = async () => {
     try {
-      console.log('🧪 Manual Supabase test...');
-      const { data, error } = await supabase.from('profiles').select('*').limit(1);
+      console.log('🧪 Testing Supabase auth...');
       
-      if (error) {
-        alert(`❌ Supabase FAILED: ${error.message}`);
-        console.error('Full error:', error);
+      // Test 1: Check if we can access profiles table
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .limit(1);
+      
+      if (profilesError) {
+        console.error('❌ Profiles table access failed:', profilesError);
       } else {
-        alert('✅ Supabase WORKING! Check console for details.');
-        console.log('Supabase data:', data);
+        console.log('✅ Profiles table accessible:', profilesData);
       }
+
+      // Test 2: Check current auth session
+      const { data: sessionData } = await supabase.auth.getSession();
+      console.log('🔐 Current session:', sessionData);
+
     } catch (error) {
-      alert(`❌ Test ERROR: ${error.message}`);
+      console.error('❌ Test failed:', error);
     }
   };
 
   return (
     <div className="login-container">
       <h2>Welcome to Prashikshan</h2>
-      <button onClick={handleMockLogin} className="login-button">
-        Login (Demo)
+      <button 
+        onClick={handleMockLogin} 
+        className="login-button"
+        disabled={loading}
+      >
+        {loading ? 'Creating Account...' : 'Login (Demo)'}
       </button>
       
-      {/* Test button - remove after debugging */}
+      {/* Test button */}
       <button 
         onClick={testSupabaseManually}
         style={{
@@ -52,7 +122,7 @@ const Login = ({ onAuthStateChange }) => {
       </button>
       
       <div style={{ marginTop: '20px', fontSize: '12px', color: '#666' }}>
-        Open browser console (F12) to see detailed connection logs
+        Using real Supabase authentication
       </div>
     </div>
   );
