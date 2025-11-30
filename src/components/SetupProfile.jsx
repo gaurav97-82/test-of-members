@@ -130,18 +130,7 @@ const SetupProfile = ({ onComplete }) => {
         </button>
       </form>
 
-      {/* Debug info - remove in production */}
-      <div style={{ 
-        marginTop: '2rem', 
-        padding: '1rem', 
-        background: '#f8f9fa', 
-        borderRadius: '8px',
-        fontSize: '0.9rem'
-      }}>
-        <h4>Debug Info</h4>
-        <p><strong>User ID:</strong> Check browser console after login</p>
-        <p><strong>Profile Data to Save:</strong> {JSON.stringify(profileData)}</p>
-      </div>
+      {/* Debug info REMOVED - this section is now gone */}
     </div>
   );
 };
