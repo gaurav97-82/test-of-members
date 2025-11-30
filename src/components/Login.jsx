@@ -3,15 +3,23 @@ import { supabase } from '../lib/supabase';
 
 const Login = ({ onAuthStateChange }) => {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSignUp = async () => {
     setLoading(true);
+    setError('');
+    
     try {
       const demoEmail = `demo${Date.now()}@prashikshan.com`;
+      const demoPassword = 'demopassword123';
       
+      console.log('🚀 Starting signup process...');
+      console.log('📧 Email:', demoEmail);
+
+      // Sign up the user
       const { data, error } = await supabase.auth.signUp({
         email: demoEmail,
-        password: 'demopassword123',
+        password: demoPassword,
         options: {
           data: {
             display_name: 'Demo User'
@@ -19,19 +27,32 @@ const Login = ({ onAuthStateChange }) => {
         }
       });
 
+      console.log('🔐 Signup response:', { data, error });
+
       if (error) {
+        // If user already exists, try to sign in
         if (error.message.includes('already registered')) {
-          await handleSignIn(demoEmail);
+          console.log('🔄 User exists, trying sign in...');
+          await handleSignIn(demoEmail, demoPassword);
         } else {
           throw error;
         }
       } else if (data.user) {
-        onAuthStateChange(data.user);
+        console.log('✅ User created successfully:', data.user);
+        console.log('🔑 Session:', data.session);
+        
+        // Wait a moment for the session to be set
+        setTimeout(() => {
+          onAuthStateChange(data.user);
+        }, 1000);
       }
     } catch (error) {
-      console.error('Sign up error:', error);
+      console.error('❌ Sign up error:', error);
+      setError(error.message);
+      
+      // Fallback to mock user
       const mockUser = {
-        id: `user_${Date.now()}`,
+        id: `mock_user_${Date.now()}`,
         email: 'demo@prashikshan.com',
         user_metadata: { display_name: 'Demo User' }
       };
@@ -41,19 +62,37 @@ const Login = ({ onAuthStateChange }) => {
     }
   };
 
-  const handleSignIn = async (email) => {
+  const handleSignIn = async (email, password) => {
     try {
+      console.log('🔑 Attempting sign in...');
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email,
-        password: 'demopassword123'
+        password: password
       });
 
       if (error) throw error;
+      
+      console.log('✅ Sign in successful:', data.user);
+      console.log('🎫 Session active:', !!data.session);
+      
       if (data.user) {
         onAuthStateChange(data.user);
       }
     } catch (error) {
+      console.error('❌ Sign in error:', error);
       throw error;
+    }
+  };
+
+  const checkCurrentSession = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('🔍 Current session:', session);
+      console.log('👤 Current user:', session?.user);
+      return session;
+    } catch (error) {
+      console.error('❌ Session check error:', error);
+      return null;
     }
   };
 
@@ -64,6 +103,12 @@ const Login = ({ onAuthStateChange }) => {
         <p className="login-subtitle">
           Your personalized learning platform. Start your journey today with a demo account.
         </p>
+        
+        {error && (
+          <div className="error-message" style={{ marginBottom: '1rem' }}>
+            <strong>Error:</strong> {error}
+          </div>
+        )}
         
         <button 
           onClick={handleSignUp} 
@@ -83,6 +128,14 @@ const Login = ({ onAuthStateChange }) => {
           ) : '🚀 Start Learning Now'}
         </button>
         
+        {/* Debug button */}
+        <button 
+          onClick={checkCurrentSession}
+          className="test-button"
+        >
+          🔍 Check Current Session
+        </button>
+        
         <div style={{ 
           marginTop: '2rem', 
           padding: '1rem', 
@@ -90,12 +143,7 @@ const Login = ({ onAuthStateChange }) => {
           borderRadius: '10px',
           fontSize: '0.9rem'
         }}>
-          <strong>Demo Features:</strong>
-          <ul style={{ textAlign: 'left', marginTop: '0.5rem', paddingLeft: '1.5rem' }}>
-            <li>Create your learning profile</li>
-            <li>Explore courses</li>
-            <li>Track your progress</li>
-          </ul>
+          <strong>Open browser console (F12) to see detailed logs</strong>
         </div>
       </div>
     </div>
