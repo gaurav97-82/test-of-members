@@ -7,7 +7,6 @@ const Login = ({ onAuthStateChange }) => {
   const handleSignUp = async () => {
     setLoading(true);
     try {
-      // Create a unique email for demo
       const demoEmail = `demo${Date.now()}@prashikshan.com`;
       
       const { data, error } = await supabase.auth.signUp({
@@ -21,19 +20,16 @@ const Login = ({ onAuthStateChange }) => {
       });
 
       if (error) {
-        // If user already exists, try sign in
         if (error.message.includes('already registered')) {
           await handleSignIn(demoEmail);
         } else {
           throw error;
         }
       } else if (data.user) {
-        console.log('✅ User created:', data.user);
         onAuthStateChange(data.user);
       }
     } catch (error) {
-      console.error('❌ Sign up error:', error);
-      // Fallback to mock user if Supabase fails
+      console.error('Sign up error:', error);
       const mockUser = {
         id: `user_${Date.now()}`,
         email: 'demo@prashikshan.com',
@@ -53,76 +49,54 @@ const Login = ({ onAuthStateChange }) => {
       });
 
       if (error) throw error;
-      
       if (data.user) {
-        console.log('✅ User signed in:', data.user);
         onAuthStateChange(data.user);
       }
     } catch (error) {
-      console.error('❌ Sign in error:', error);
       throw error;
-    }
-  };
-
-  const handleMockLogin = () => {
-    // Use actual Supabase auth instead of mock
-    handleSignUp();
-  };
-
-  const testSupabaseManually = async () => {
-    try {
-      console.log('🧪 Testing Supabase auth...');
-      
-      // Test 1: Check if we can access profiles table
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .limit(1);
-      
-      if (profilesError) {
-        console.error('❌ Profiles table access failed:', profilesError);
-      } else {
-        console.log('✅ Profiles table accessible:', profilesData);
-      }
-
-      // Test 2: Check current auth session
-      const { data: sessionData } = await supabase.auth.getSession();
-      console.log('🔐 Current session:', sessionData);
-
-    } catch (error) {
-      console.error('❌ Test failed:', error);
     }
   };
 
   return (
     <div className="login-container">
-      <h2>Welcome to Prashikshan</h2>
-      <button 
-        onClick={handleMockLogin} 
-        className="login-button"
-        disabled={loading}
-      >
-        {loading ? 'Creating Account...' : 'Login (Demo)'}
-      </button>
-      
-      {/* Test button */}
-      <button 
-        onClick={testSupabaseManually}
-        style={{
-          marginTop: '20px',
-          background: '#666',
-          color: 'white',
-          padding: '10px 20px',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer'
-        }}
-      >
-        🧪 Test Supabase Connection
-      </button>
-      
-      <div style={{ marginTop: '20px', fontSize: '12px', color: '#666' }}>
-        Using real Supabase authentication
+      <div style={{ maxWidth: '400px', width: '100%' }}>
+        <h2>Welcome to Prashikshan</h2>
+        <p className="login-subtitle">
+          Your personalized learning platform. Start your journey today with a demo account.
+        </p>
+        
+        <button 
+          onClick={handleSignUp} 
+          className="login-button"
+          disabled={loading}
+        >
+          {loading ? (
+            <>
+              <div className="loading-spinner" style={{ 
+                width: '20px', 
+                height: '20px', 
+                display: 'inline-block',
+                marginRight: '10px'
+              }}></div>
+              Creating Account...
+            </>
+          ) : '🚀 Start Learning Now'}
+        </button>
+        
+        <div style={{ 
+          marginTop: '2rem', 
+          padding: '1rem', 
+          background: 'rgba(255,255,255,0.1)', 
+          borderRadius: '10px',
+          fontSize: '0.9rem'
+        }}>
+          <strong>Demo Features:</strong>
+          <ul style={{ textAlign: 'left', marginTop: '0.5rem', paddingLeft: '1.5rem' }}>
+            <li>Create your learning profile</li>
+            <li>Explore courses</li>
+            <li>Track your progress</li>
+          </ul>
+        </div>
       </div>
     </div>
   );
