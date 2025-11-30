@@ -8,26 +8,34 @@ const SetupProfile = ({ onComplete }) => {
     level: 'beginner'
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!profileData.name.trim()) {
-      alert('Please enter your name');
+      setError('Please enter your name');
       return;
     }
 
     setLoading(true);
+    setError('');
     
     try {
       // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        throw new Error(`Auth error: ${userError.message}`);
+      }
       
       if (!user) {
-        throw new Error('No user found');
+        throw new Error('No user found. Please login again.');
       }
 
+      console.log('Saving profile for user:', user.id);
+
       // Save to Supabase
-      const { data, error } = await supabase
+      const { data, error: saveError } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
@@ -38,14 +46,16 @@ const SetupProfile = ({ onComplete }) => {
         })
         .select();
 
-      if (error) throw error;
+      if (saveError) {
+        throw new Error(`Database error: ${saveError.message}`);
+      }
 
-      console.log('Profile saved to Supabase:', data);
+      console.log('Profile saved successfully:', data);
       onComplete(profileData);
       
     } catch (error) {
       console.error('Error saving profile:', error);
-      alert('Error saving profile. Please try again.');
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -56,12 +66,25 @@ const SetupProfile = ({ onComplete }) => {
       ...prev,
       [field]: value
     }));
+    setError(''); // Clear error when user types
   };
 
   return (
     <div className="setup-profile-container">
       <h2>Setup Your Profile</h2>
       <p>Tell us about yourself to personalize your learning experience</p>
+      
+      {error && (
+        <div className="error-message" style={{ 
+          background: '#ffebee', 
+          color: '#c62828', 
+          padding: '10px', 
+          borderRadius: '4px',
+          marginBottom: '1rem'
+        }}>
+          <strong>Error:</strong> {error}
+        </div>
+      )}
       
       <form onSubmit={handleSubmit}>
         <div className="form-group">
@@ -101,6 +124,13 @@ const SetupProfile = ({ onComplete }) => {
           {loading ? 'Saving...' : 'Complete Setup & Start Learning'}
         </button>
       </form>
+
+      {/* Debug info */}
+      <div style={{ marginTop: '2rem', padding: '1rem', background: '#f5f5f5', borderRadius: '4px' }}>
+        <h4>Debug Info:</h4>
+        <p><strong>Environment Variables Loaded:</strong> {import.meta.env.VITE_SUPABASE_URL ? 'Yes' : 'No'}</p>
+        <p><strong>Supabase Client:</strong> {supabase ? 'Initialized' : 'Not initialized'}</p>
+      </div>
     </div>
   );
 };
