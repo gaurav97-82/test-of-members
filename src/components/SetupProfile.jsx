@@ -24,45 +24,46 @@ const SetupProfile = ({ onComplete }) => {
       // Get current user from Supabase
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
-      let userId;
+      console.log('🔄 Starting profile save process...');
+      console.log('👤 Current user:', user);
       
       if (userError || !user) {
-        console.log('No Supabase user, using mock user');
-        // Fallback: create a mock user ID
-        userId = `mock_user_${Date.now()}`;
-      } else {
-        userId = user.id;
-        
-        // Save to Supabase if we have a real user
-        const { data, error: saveError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: userId,
-            full_name: profileData.name,
-            interests: profileData.interests,
-            skill_level: profileData.level,
-            updated_at: new Date().toISOString(),
-          })
-          .select();
-
-        if (saveError) {
-          console.error('Supabase save failed, using localStorage:', saveError);
-          // Continue with localStorage fallback
-        } else {
-          console.log('✅ Profile saved to Supabase:', data);
-        }
+        throw new Error('No authenticated user found. Please login again.');
       }
 
-      // Always save to localStorage as backup
-      localStorage.setItem(`profile_${userId}`, JSON.stringify(profileData));
-      localStorage.setItem(`setupComplete_${userId}`, 'true');
+      // Prepare profile data
+      const profileToSave = {
+        id: user.id,
+        full_name: profileData.name,
+        interests: profileData.interests,
+        skill_level: profileData.level,
+        updated_at: new Date().toISOString(),
+      };
+
+      console.log('💾 Saving profile data:', profileToSave);
+
+      // Save to Supabase
+      const { data, error: saveError } = await supabase
+        .from('profiles')
+        .upsert(profileToSave)
+        .select();
+
+      if (saveError) {
+        console.error('❌ Supabase save error:', saveError);
+        throw new Error(`Failed to save profile: ${saveError.message}`);
+      }
+
+      console.log('✅ Profile saved successfully:', data);
       
-      console.log('✅ Profile setup completed');
+      // Also save to localStorage as backup
+      localStorage.setItem(`profile_${user.id}`, JSON.stringify(profileData));
+      localStorage.setItem(`setupComplete_${user.id}`, 'true');
+      
       onComplete(profileData);
       
     } catch (error) {
-      console.error('Error saving profile:', error);
-      setError('Error saving profile: ' + error.message);
+      console.error('❌ Error saving profile:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -82,13 +83,7 @@ const SetupProfile = ({ onComplete }) => {
       <p>Tell us about yourself to personalize your learning experience</p>
       
       {error && (
-        <div className="error-message" style={{ 
-          background: '#ffebee', 
-          color: '#c62828', 
-          padding: '10px', 
-          borderRadius: '4px',
-          marginBottom: '1rem'
-        }}>
+        <div className="error-message">
           <strong>Error:</strong> {error}
         </div>
       )}
@@ -134,6 +129,19 @@ const SetupProfile = ({ onComplete }) => {
           {loading ? 'Saving...' : 'Complete Setup & Start Learning'}
         </button>
       </form>
+
+      {/* Debug info - remove in production */}
+      <div style={{ 
+        marginTop: '2rem', 
+        padding: '1rem', 
+        background: '#f8f9fa', 
+        borderRadius: '8px',
+        fontSize: '0.9rem'
+      }}>
+        <h4>Debug Info</h4>
+        <p><strong>User ID:</strong> Check browser console after login</p>
+        <p><strong>Profile Data to Save:</strong> {JSON.stringify(profileData)}</p>
+      </div>
     </div>
   );
 };
