@@ -1,33 +1,85 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import Login from './components/Login.jsx';
+import Discover from './components/Discover.jsx';
+import SetupProfile from './components/SetupProfile.jsx';
 import { supabase } from './lib/supabase';
+import './App.css';
 
 function App() {
+  const [user, setUser] = useState(null);
+  const [setupComplete, setSetupComplete] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        const user = session.user;
-        const payload = {
-          user_id: user.id,
-          email: user.email || null,
-          provider: session.provider || null,
-          metadata: { user_metadata: user.user_metadata || null }
-        };
-
-        const { error } = await supabase.from('login_events').insert(payload);
-        if (error) {
-          console.error('Failed to record login event:', error);
+    // Check current auth session
+    checkUser();
+    
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          setUser(session.user);
+          await checkUserProfile(session.user.id);
+        } else {
+          setUser(null);
+          setSetupComplete(false);
         }
+        setLoading(false);
       }
-    });
+    );
 
-    return () => {
-      authListener?.subscription?.unsubscribe?.();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
+  const checkUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      setUser(session.user);
+      await checkUserProfile(session.user.id);
+    }
+    setLoading(false);
+  };
+
+  const checkUserProfile = async (userId) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    setSetupComplete(!!data && !error);
+  };
+
+  const handleAuthStateChange = (userData) => {
+    setUser(userData);
+    setSetupComplete(false);
+  };
+
+  const handleSetupComplete = async (profileData) => {
+    setSetupComplete(true);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner">Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <h1>App</h1>
+    <div className="App">
+      {!user ? (
+        <Login onAuthStateChange={handleAuthStateChange} />
+      ) : !setupComplete ? (
+        <SetupProfile onComplete={handleSetupComplete} />
+      ) : (
+        <Discover user={user} onLogout={handleLogout} />
+      )}
     </div>
   );
 }
