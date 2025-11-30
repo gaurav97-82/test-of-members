@@ -2,29 +2,29 @@ import React from 'react';
 import { supabase } from '../lib/supabase';
 
 const Login = ({ onAuthStateChange }) => {
-  const handleEmailLogin = async () => {
-    // For demo - you can use magic link or email/password
-    const { data, error } = await supabase.auth.signInWithOtp({
-      email: 'demo@prashikshan.com',
-      options: {
-        shouldCreateUser: true, // Creates user if doesn't exist
-      }
-    });
-    
-    if (!error) {
-      console.log('Magic link sent!');
-    }
+  const handleMockLogin = () => {
+    const mockUser = {
+      uid: `user_${Date.now()}`,
+      email: 'demo@example.com',
+      displayName: 'Demo User'
+    };
+    onAuthStateChange(mockUser);
   };
 
-  const handleMockLogin = async () => {
-    // For quick testing - creates a user
-    const { data, error } = await supabase.auth.signUp({
-      email: `user${Date.now()}@prashikshan.com`,
-      password: 'demo123',
-    });
-    
-    if (data.user) {
-      onAuthStateChange(data.user);
+  const testSupabaseManually = async () => {
+    try {
+      console.log('🧪 Manual Supabase test...');
+      const { data, error } = await supabase.from('profiles').select('*').limit(1);
+      
+      if (error) {
+        alert(`❌ Supabase FAILED: ${error.message}`);
+        console.error('Full error:', error);
+      } else {
+        alert('✅ Supabase WORKING! Check console for details.');
+        console.log('Supabase data:', data);
+      }
+    } catch (error) {
+      alert(`❌ Test ERROR: ${error.message}`);
     }
   };
 
@@ -32,11 +32,28 @@ const Login = ({ onAuthStateChange }) => {
     <div className="login-container">
       <h2>Welcome to Prashikshan</h2>
       <button onClick={handleMockLogin} className="login-button">
-        Quick Login (Demo)
+        Login (Demo)
       </button>
-      <button onClick={handleEmailLogin} style={{marginTop: '10px'}}>
-        Send Magic Link
+      
+      {/* Test button - remove after debugging */}
+      <button 
+        onClick={testSupabaseManually}
+        style={{
+          marginTop: '20px',
+          background: '#666',
+          color: 'white',
+          padding: '10px 20px',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer'
+        }}
+      >
+        🧪 Test Supabase Connection
       </button>
+      
+      <div style={{ marginTop: '20px', fontSize: '12px', color: '#666' }}>
+        Open browser console (F12) to see detailed connection logs
+      </div>
     </div>
   );
 };
